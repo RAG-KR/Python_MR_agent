@@ -1,0 +1,7 @@
+tree-sitter==0.25.2
+tree-sitter-typescript==0.23.2
+GitPython==3.1.49
+ollama==0.6.2
+typer==0.25.1
+rich==15.0.0
+pydantic==2.13.3
