@@ -39,25 +39,55 @@ Local AI-powered Merge Request review agent using Ollama and tree-sitter.
    # Install Ollama
    curl -fsSL https://ollama.com/install.sh | sh
 
-   # Pull model
-   ollama pull gemma2:27b
+   # Pull model (default: gemma4:26b - ~17GB)
+   ollama pull gemma4:26b
+
+   # Or use smaller/faster models if needed:
+   # ollama pull gemma2:9b    # ~5GB, faster but less accurate
+   # ollama pull gemma2:2b    # ~1.6GB, very fast
 
    # Start server
    ollama serve
    ```
 
-### Install
+   **Model info:** https://ollama.com/library/gemma4
+
+### Quick Install (Recommended)
+
+```bash
+# Clone repository
+git clone https://github.com/RAG-KR/Python_MR_agent.git
+cd Python_MR_agent
+
+# Run installer
+chmod +x install.sh
+./install.sh
+
+# Reload shell
+source ~/.zshrc  # or ~/.bashrc
+
+# Test it works
+mr-review --help
+```
+
+The installer:
+- Copies files to `~/.mr-review-agent/`
+- Creates Python virtual environment
+- Installs all dependencies from `requirements.txt`
+- Adds global `mr-review` command
+
+### Manual Install (Development)
 
 ```bash
 # Clone/navigate to repo
-cd mr-review-v3
+cd Python_MR_agent
 
 # Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
 # Install dependencies
-pip install tree-sitter tree-sitter-typescript gitpython ollama typer rich pydantic
+pip install -r requirements.txt
 
 # Make CLI executable
 chmod +x cli.py
@@ -65,7 +95,26 @@ chmod +x cli.py
 
 ## Usage
 
-### Basic Review
+### Using Global Command (After install.sh)
+
+```bash
+# Navigate to any TypeScript/JavaScript repo
+cd /path/to/your/repo
+
+# Review current branch against main
+mr-review
+
+# Specify base branch
+mr-review --base develop
+
+# Use different model
+mr-review --model gemma4:26b
+
+# Custom output path
+mr-review --output ./my-review.md
+```
+
+### Using Direct Python (Development)
 
 ```bash
 # Review current branch against main
@@ -75,22 +124,25 @@ python cli.py review
 python cli.py review --base develop
 
 # Use different model
-python cli.py review --model gemma2:27b
+python cli.py review --model gemma4:26b
 
 # Custom output path
 python cli.py review --output ./my-review.md
 ```
 
-### Test Ollama
+### Other Commands
 
 ```bash
-python cli.py test-ollama
-```
+# Test Ollama connection
+mr-review test-ollama
+# or: python cli.py test-ollama
 
-### Initialize Config
+# Initialize config file
+mr-review init
+# or: python cli.py init
 
-```bash
-python cli.py init
+# Show help
+mr-review --help
 ```
 
 ## How It Works
@@ -106,7 +158,7 @@ python cli.py init
 
 ### Phase 2: LLM Review (30-40 seconds)
 
-7. **Generate Review** - Send context to Ollama (gemma2:27b)
+7. **Generate Review** - Send context to Ollama (gemma4:26b)
 8. **Write Report** - Save formatted markdown review
 
 **Total Time: 70-90 seconds** ⚡
@@ -138,12 +190,12 @@ mr-review-agent/
 
 ## Configuration
 
-Create `.reviewrc` in your repo:
+Create `.reviewrc` in your repo (optional):
 
 ```json
 {
   "model": {
-    "name": "gemma2:27b",
+    "name": "gemma4:26b",
     "temperature": 0.2
   },
   "review": {
@@ -214,6 +266,15 @@ Target performance (10-file MR):
 
 ## Troubleshooting
 
+### "mr-review: command not found"
+```bash
+# Reload your shell
+source ~/.zshrc  # or ~/.bashrc
+
+# Or run installer again
+./install.sh
+```
+
 ### "Ollama connection failed"
 ```bash
 # Start Ollama
@@ -221,6 +282,9 @@ ollama serve
 
 # Verify model is available
 ollama list
+
+# Pull model if missing
+ollama pull gemma4:26b
 ```
 
 ### "No changed files found"
@@ -236,6 +300,9 @@ git diff main
 - Check if ripgrep is installed: `brew install ripgrep`
 - Reduce number of changed files
 - Use a faster model: `gemma2:9b`
+
+### Large MR Issues (>100 functions)
+For known limitations with large MRs, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md)
 
 ## License
 

@@ -4,7 +4,6 @@
 import os
 import sys
 from pathlib import Path
-from datetime import datetime
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
@@ -70,7 +69,7 @@ def init():
     """Initialize .reviewrc configuration file."""
     config = """{
   "model": {
-    "name": "gemma2:27b",
+    "name": "gemma4:26b",
     "temperature": 0.2
   },
   "review": {
